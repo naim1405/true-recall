@@ -11,6 +11,7 @@ endif()
 
 add_executable(wayback
     src/main.cpp
+    src/FocusTracker.cpp
 )
 
 if(WIN32)

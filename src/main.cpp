@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <iostream>
+#include "FocusTracker.h"
 
 // Global flag for clean shutdown
 volatile bool g_running = true;
@@ -22,6 +23,13 @@ int main() {
     }
 
     std::cout << "Wayback started. Press Ctrl+C to exit." << std::endl;
+
+    // Create and start focus tracker
+    FocusTracker tracker;
+    if (!tracker.Start()) {
+        std::cerr << "Failed to start focus tracker" << std::endl;
+        return 1;
+    }
 
     // Win32 message loop
     MSG msg = {};
