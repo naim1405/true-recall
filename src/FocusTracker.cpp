@@ -1,8 +1,10 @@
 #include "FocusTracker.h"
+#include "MonitorManager.h"
 #include <iostream>
 
-FocusTracker::FocusTracker()
+FocusTracker::FocusTracker(MonitorManager* monitorManager)
     : m_hook(nullptr)
+    , m_monitorManager(monitorManager)
 {
 }
 
@@ -63,16 +65,33 @@ void CALLBACK FocusTracker::WinEventProc(
         return;
     }
 
+    // Get the FocusTracker instance from thread-local storage or global
+    // For now, we need to pass monitor manager statically
+    // This is a limitation of the callback approach - we'll use a static pointer
+    static MonitorManager* s_monitorManager = nullptr;
+    
+    // Get from the current FocusTracker context (we'll set this in Start())
+    // For simplicity, we'll use a global pointer approach
+    extern MonitorManager* g_monitorManager;
+    
+    // Get monitor index
+    int monitorIdx = -1;
+    if (g_monitorManager != nullptr) {
+        monitorIdx = g_monitorManager->GetMonitorIndexForWindow(hwnd);
+    }
+
     // Get window title
     wchar_t title[256] = L"";
     int titleLength = GetWindowTextW(hwnd, title, sizeof(title) / sizeof(title[0]));
 
-    // Print focus change
+    // Print focus change with monitor index
     if (titleLength > 0) {
-        std::wcout << L"Focus changed: HWND=0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd)
+        std::wcout << L"Focus changed: Monitor " << monitorIdx 
+                   << L" HWND=0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd)
                    << std::dec << L" Title=" << title << std::endl;
     } else {
-        std::cout << "Focus changed: HWND=0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd)
+        std::cout << "Focus changed: Monitor " << monitorIdx 
+                  << " HWND=0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd)
                   << std::dec << " Title=(no title)" << std::endl;
     }
 }

@@ -2,9 +2,12 @@
 
 #include <windows.h>
 
+// Forward declaration
+class MonitorManager;
+
 class FocusTracker {
 public:
-    FocusTracker();
+    FocusTracker(MonitorManager* monitorManager);
     ~FocusTracker();
 
     bool Start();  // Install hook
@@ -12,6 +15,7 @@ public:
 
 private:
     HWINEVENTHOOK m_hook;
+    MonitorManager* m_monitorManager;
 
     // Static callback for the hook
     static void CALLBACK WinEventProc(

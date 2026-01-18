@@ -12,6 +12,7 @@ endif()
 add_executable(wayback
     src/main.cpp
     src/FocusTracker.cpp
+    src/MonitorManager.cpp
 )
 
 if(WIN32)

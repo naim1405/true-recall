@@ -1,9 +1,13 @@
 #include <windows.h>
 #include <iostream>
 #include "FocusTracker.h"
+#include "MonitorManager.h"
 
 // Global flag for clean shutdown
 volatile bool g_running = true;
+
+// Global monitor manager pointer for callback access
+MonitorManager* g_monitorManager = nullptr;
 
 // Console control handler for Ctrl+C
 BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
@@ -24,8 +28,14 @@ int main() {
 
     std::cout << "Wayback started. Press Ctrl+C to exit." << std::endl;
 
+    // Create and enumerate monitors
+    MonitorManager monitorManager;
+    g_monitorManager = &monitorManager;
+    monitorManager.EnumerateMonitors();
+    monitorManager.PrintMonitorInfo();
+
     // Create and start focus tracker
-    FocusTracker tracker;
+    FocusTracker tracker(&monitorManager);
     if (!tracker.Start()) {
         std::cerr << "Failed to start focus tracker" << std::endl;
         return 1;
