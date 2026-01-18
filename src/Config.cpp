@@ -4,7 +4,7 @@
 #include <sstream>
 #include <algorithm>
 
-Config::Config() {
+Config::Config() : m_moveMouse(true) {
     // Get config file path in the same directory as the executable
     wchar_t exePath[MAX_PATH];
     GetModuleFileNameW(NULL, exePath, MAX_PATH);
@@ -53,6 +53,10 @@ bool Config::Load() {
             if (!ParseHotkeyString(value)) {
                 std::wcerr << L"Invalid hotkey format: " << value << std::endl;
             }
+        } else if (key == L"MoveMouseToMonitor") {
+            // Parse boolean (true/false, yes/no, 1/0)
+            std::transform(value.begin(), value.end(), value.begin(), ::towlower);
+            m_moveMouse = (value == L"true" || value == L"yes" || value == L"1");
         }
     }
     
@@ -74,9 +78,13 @@ bool Config::Save() {
     file << L"; Hotkey format: Modifier+Modifier+Key\n";
     file << L"; Modifiers: Ctrl, Alt, Shift, Win\n";
     file << L"; Keys: A-Z, 0-9, F1-F12, or special keys\n";
-    file << L"; Example: Ctrl+Alt+N\n";
+    file << L"; Example: Alt+N\n";
     file << L"\n";
     file << L"CycleMonitorHotkey=" << GetHotkeyString() << L"\n";
+    file << L"\n";
+    file << L"; Move mouse cursor to the monitor when switching\n";
+    file << L"; Set to true or false\n";
+    file << L"MoveMouseToMonitor=" << (m_moveMouse ? L"true" : L"false") << L"\n";
     
     file.close();
     std::wcout << L"Config saved: " << m_configPath << std::endl;
@@ -84,9 +92,12 @@ bool Config::Save() {
 }
 
 void Config::CreateDefaultConfig() {
-    // Use default hotkey (Ctrl+Alt+N)
-    m_hotkey.modifiers = MOD_CONTROL | MOD_ALT | MOD_NOREPEAT;
+    // Use default hotkey (Alt+N)
+    m_hotkey.modifiers = MOD_ALT | MOD_NOREPEAT;
     m_hotkey.vkey = 'N';
+    
+    // Enable mouse repositioning by default
+    m_moveMouse = true;
     
     Save();
 }

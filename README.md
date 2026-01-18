@@ -24,14 +24,15 @@ Wayback is a lightweight background utility that adds per-monitor focus memory t
 1. Download `wayback.exe` from the latest release
 2. Run `wayback.exe`
 3. Look for the Wayback icon in your system tray
-4. Use the default hotkey **Ctrl+Alt+N** to cycle between monitors
+4. Use the default hotkey **Alt+N** to cycle between monitors
 
 ### Usage
 
 1. Open applications on different monitors
 2. Work naturally, switching focus between windows
-3. Press **Ctrl+Alt+N** to jump to the next monitor
+3. Press **Alt+N** to jump to the next monitor
 4. Wayback automatically focuses the last active window on that monitor
+5. (Optional) Mouse cursor moves to the target monitor automatically
 
 ### Configuration
 
@@ -42,18 +43,27 @@ Edit `wayback.ini` (created in the same folder as `wayback.exe`):
 ;
 ; Hotkey format: Modifier+Modifier+Key
 ; Modifiers: Ctrl, Alt, Shift, Win
-; Keys: A-Z, 0-9, F1-F12, or special keys
-; Example: Ctrl+Alt+M
+; Keys: A-ZAlt+M
 
+CycleMonitorHotkey=Alt+N
+
+; Move mouse cursor to the monitor when switching
+; Set to true or false
+MoveMouseToMonitor=true
 CycleMonitorHotkey=Ctrl+Alt+N
 ```
 
 **Supported Keys:**
 - Letters: A-Z
 - Numbers: 0-9
-- Function keys: F1-F12
-- Modifiers: Ctrl, Alt, Shift, Win
+- Function keys: Add Ctrl modifier
+- `Win+Shift+F1` - Use Win key with F1
+- `Ctrl+Shift+9` - Use a number key
+- `Alt+M` - Simple Alt+Key combination
 
+**Mouse Cursor Movement:**
+- `MoveMouseToMonitor=true` - Cursor moves to center of target monitor (default)
+- `MoveMouseToMonitor=false` - Cursor stays in place
 **Examples:**
 - `Ctrl+Alt+M` - Different letter
 - `Win+Shift+F1` - Use Win key with F1

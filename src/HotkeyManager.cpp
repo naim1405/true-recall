@@ -106,6 +106,22 @@ void HotkeyManager::HandleHotkey(int hotkeyId) {
     
     std::cout << "\nSwitched to Monitor " << m_currentMonitor << std::endl;
     
+    // Move mouse cursor to the target monitor if configured
+    if (m_config->GetMoveMouse()) {
+        HMONITOR hMonitor = m_monitorManager->GetMonitorHandle(m_currentMonitor);
+        if (hMonitor) {
+            MONITORINFO info = {};
+            info.cbSize = sizeof(MONITORINFO);
+            if (GetMonitorInfo(hMonitor, &info)) {
+                // Move cursor to center of the monitor
+                int centerX = (info.rcMonitor.left + info.rcMonitor.right) / 2;
+                int centerY = (info.rcMonitor.top + info.rcMonitor.bottom) / 2;
+                SetCursorPos(centerX, centerY);
+                std::cout << "  Moved cursor to monitor center (" << centerX << ", " << centerY << ")" << std::endl;
+            }
+        }
+    }
+    
     // Try to get a valid window from the focus stack
     // If the top window is invalid, try the next one
     HWND targetWindow = nullptr;

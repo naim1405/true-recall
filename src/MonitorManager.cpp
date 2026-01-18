@@ -36,6 +36,13 @@ int MonitorManager::GetMonitorIndexForWindow(HWND hwnd) const {
     return -1;  // Not found (shouldn't happen with MONITOR_DEFAULTTONEAREST)
 }
 
+HMONITOR MonitorManager::GetMonitorHandle(int monitorIndex) const {
+    if (monitorIndex < 0 || monitorIndex >= static_cast<int>(m_monitors.size())) {
+        return nullptr;
+    }
+    return m_monitors[monitorIndex];
+}
+
 void MonitorManager::PrintMonitorInfo() const {
     for (size_t i = 0; i < m_monitors.size(); ++i) {
         MONITORINFO info = {};

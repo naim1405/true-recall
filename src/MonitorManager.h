@@ -11,6 +11,7 @@ public:
     void EnumerateMonitors();  // Detect connected monitors
     int GetMonitorCount() const;
     int GetMonitorIndexForWindow(HWND hwnd) const;  // Which monitor is this window on?
+    HMONITOR GetMonitorHandle(int monitorIndex) const;  // Get monitor handle by index
     
     // Focus stack management
     void OnWindowFocused(HWND hwnd);  // Called when window gets focus

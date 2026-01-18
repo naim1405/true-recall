@@ -71,9 +71,9 @@ void TrayIcon::ShowAboutDialog(HWND hwnd) {
     MessageBox(hwnd, 
         TEXT("Wayback v1.0\n\n")
         TEXT("Per-Monitor Focus Switching for Windows\n\n")
-        TEXT("Hotkey: Ctrl+Alt+N (or custom)\n")
+        TEXT("Default Hotkey: Alt+N\n")
         TEXT("Cycles between monitors and focuses the last active window.\n\n")
-        TEXT("Configure hotkeys in wayback.ini"),
+        TEXT("Configure hotkeys and options in wayback.ini"),
         TEXT("About Wayback"),
         MB_OK | MB_ICONINFORMATION);
 }
