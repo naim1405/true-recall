@@ -4,8 +4,9 @@
 // Static pointer for window procedure access
 static HotkeyManager* g_hotkeyManager = nullptr;
 
-HotkeyManager::HotkeyManager(MonitorManager* monitorManager)
+HotkeyManager::HotkeyManager(MonitorManager* monitorManager, Config* config)
     : m_monitorManager(monitorManager)
+    , m_config(config)
     , m_currentMonitor(0)
     , m_messageWindow(nullptr) {
     g_hotkeyManager = this;
@@ -67,13 +68,19 @@ bool HotkeyManager::RegisterHotkeys() {
         return false;
     }
     
-    // Register Ctrl+Alt+N for monitor cycling
-    if (!RegisterHotKey(m_messageWindow, HOTKEY_CYCLE_MONITOR, MOD_CONTROL | MOD_ALT | MOD_NOREPEAT, 'N')) {
-        std::cerr << "Failed to register hotkey Ctrl+Alt+N: " << GetLastError() << std::endl;
+    // Get hotkey config
+    HotkeyConfig hotkey = m_config->GetHotkeyConfig();
+    
+    // Register hotkey for monitor cycling
+    if (!RegisterHotKey(m_messageWindow, HOTKEY_CYCLE_MONITOR, hotkey.modifiers, hotkey.vkey)) {
+        std::wcerr << L"Failed to register hotkey " << m_config->GetHotkeyString() 
+                   << L": " << GetLastError() << std::endl;
+        std::wcerr << L"The hotkey may already be in use by another application." << std::endl;
         return false;
     }
     
-    std::cout << "Hotkeys registered: Ctrl+Alt+N = Cycle Monitor" << std::endl;
+    std::wcout << L"Hotkey registered: " << m_config->GetHotkeyString() 
+               << L" = Cycle Monitor" << std::endl;
     return true;
 }
 

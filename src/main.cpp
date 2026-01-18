@@ -3,12 +3,20 @@
 #include "FocusTracker.h"
 #include "MonitorManager.h"
 #include "HotkeyManager.h"
+#include "TrayIcon.h"
+#include "Config.h"
 
 // Global flag for clean shutdown
 volatile bool g_running = true;
 
 // Global monitor manager pointer for callback access
 MonitorManager* g_monitorManager = nullptr;
+
+// Global tray icon
+TrayIcon* g_trayIcon = nullptr;
+
+// Main window handle
+HWND g_mainWindow = nullptr;
 
 // Console control handler for Ctrl+C
 BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
@@ -20,14 +28,85 @@ BOOL WINAPI ConsoleCtrlHandler(DWORD dwCtrlType) {
     return FALSE;
 }
 
+// Window procedure for main window (handles tray icon messages)
+LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+    // Let TrayIcon handle its messages
+    LRESULT result = TrayIcon::WndProc(hwnd, msg, wParam, lParam);
+    
+    if (msg == WM_QUIT || msg == WM_DESTROY) {
+        g_running = false;
+        PostQuitMessage(0);
+        return 0;
+    }
+    
+    return result;
+}
+
+bool CreateMainWindow() {
+    // Register window class
+    WNDCLASSEX wc = {};
+    wc.cbSize = sizeof(WNDCLASSEX);
+    wc.lpfnWndProc = MainWndProc;
+    wc.hInstance = GetModuleHandle(nullptr);
+    wc.lpszClassName = "WaybackMainWindow";
+    
+    if (!RegisterClassEx(&wc)) {
+        DWORD error = GetLastError();
+        if (error != ERROR_CLASS_ALREADY_EXISTS) {
+            std::cerr << "Failed to register main window class: " << error << std::endl;
+            return false;
+        }
+    }
+    
+    // Create message-only window
+    g_mainWindow = CreateWindowEx(
+        0,
+        "WaybackMainWindow",
+        "Wayback",
+        0,
+        0, 0, 0, 0,
+        HWND_MESSAGE,  // Message-only window
+        nullptr,
+        GetModuleHandle(nullptr),
+        nullptr
+    );
+    
+    if (!g_mainWindow) {
+        std::cerr << "Failed to create main window: " << GetLastError() << std::endl;
+        return false;
+    }
+    
+    return true;
+}
+
 int main() {
+    // Allocate console for debugging (can be removed for silent operation)
+    #ifdef _DEBUG
+    AllocConsole();
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    #endif
+
     // Set up console control handler
     if (!SetConsoleCtrlHandler(ConsoleCtrlHandler, TRUE)) {
         std::cerr << "Failed to set console control handler" << std::endl;
         return 1;
     }
 
-    std::cout << "Wayback started. Press Ctrl+C to exit." << std::endl;
+    std::cout << "Wayback started." << std::endl;
+    
+    // Create main window for tray icon
+    if (!CreateMainWindow()) {
+        return 1;
+    }
+    
+    // Load configuration
+    Config config;
+    if (!config.Load()) {
+        std::cerr << "Failed to load configuration" << std::endl;
+        return 1;
+    }
 
     // Create and enumerate monitors
     MonitorManager monitorManager;
@@ -43,10 +122,18 @@ int main() {
     }
 
     // Create and register hotkeys
-    HotkeyManager hotkeyManager(&monitorManager);
+    HotkeyManager hotkeyManager(&monitorManager, &config);
     if (!hotkeyManager.RegisterHotkeys()) {
         std::cerr << "Failed to register hotkeys" << std::endl;
         return 1;
+    }
+    
+    // Create system tray icon
+    TrayIcon trayIcon;
+    g_trayIcon = &trayIcon;
+    if (!trayIcon.Create(g_mainWindow)) {
+        std::cerr << "Failed to create tray icon" << std::endl;
+        // Continue anyway, not critical
     }
 
     // Win32 message loop
@@ -68,6 +155,9 @@ int main() {
     // Clean shutdown
     std::cout << "\nCleaning up..." << std::endl;
     
+    // Destroy tray icon
+    trayIcon.Destroy();
+    
     // Stop focus tracker (unhooks events)
     tracker.Stop();
     
@@ -75,5 +165,10 @@ int main() {
     hotkeyManager.UnregisterHotkeys();
     
     std::cout << "Wayback terminated cleanly." << std::endl;
+    
+    #ifdef _DEBUG
+    FreeConsole();
+    #endif
+    
     return 0;
 }

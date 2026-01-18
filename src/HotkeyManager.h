@@ -2,13 +2,14 @@
 
 #include <windows.h>
 #include "MonitorManager.h"
+#include "Config.h"
 
 // Hotkey IDs
 #define HOTKEY_CYCLE_MONITOR 1
 
 class HotkeyManager {
 public:
-    HotkeyManager(MonitorManager* monitorManager);
+    HotkeyManager(MonitorManager* monitorManager, Config* config);
     ~HotkeyManager();
     
     bool RegisterHotkeys();
@@ -17,6 +18,7 @@ public:
 
 private:
     MonitorManager* m_monitorManager;
+    Config* m_config;
     int m_currentMonitor;
     HWND m_messageWindow;  // Hidden window for receiving hotkey messages
     
