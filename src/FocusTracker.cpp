@@ -78,6 +78,9 @@ void CALLBACK FocusTracker::WinEventProc(
     int monitorIdx = -1;
     if (g_monitorManager != nullptr) {
         monitorIdx = g_monitorManager->GetMonitorIndexForWindow(hwnd);
+        
+        // Update focus stack
+        g_monitorManager->OnWindowFocused(hwnd);
     }
 
     // Get window title
@@ -93,5 +96,10 @@ void CALLBACK FocusTracker::WinEventProc(
         std::cout << "Focus changed: Monitor " << monitorIdx 
                   << " HWND=0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd)
                   << std::dec << " Title=(no title)" << std::endl;
+    }
+    
+    // Print focus stacks after each focus change
+    if (g_monitorManager != nullptr) {
+        g_monitorManager->PrintFocusStacks();
     }
 }

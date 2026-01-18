@@ -1,5 +1,6 @@
 #include "MonitorManager.h"
 #include <iostream>
+#include <algorithm>
 
 MonitorManager::MonitorManager() {
 }
@@ -58,4 +59,79 @@ BOOL CALLBACK MonitorManager::MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor,
     MonitorManager* pThis = reinterpret_cast<MonitorManager*>(dwData);
     pThis->m_monitors.push_back(hMonitor);
     return TRUE;  // Continue enumeration
+}
+
+void MonitorManager::OnWindowFocused(HWND hwnd) {
+    if (hwnd == nullptr || !IsWindow(hwnd)) {
+        return;
+    }
+    
+    // Determine which monitor this window is on
+    int monitorIndex = GetMonitorIndexForWindow(hwnd);
+    if (monitorIndex < 0) {
+        return;  // Invalid monitor
+    }
+    
+    // Get or create the focus stack for this monitor
+    std::vector<HWND>& stack = m_focusStacks[monitorIndex];
+    
+    // Remove hwnd if it's already in the stack (avoid duplicates)
+    auto it = std::find(stack.begin(), stack.end(), hwnd);
+    if (it != stack.end()) {
+        stack.erase(it);
+    }
+    
+    // Add hwnd to the front (most recent)
+    stack.insert(stack.begin(), hwnd);
+    
+    // Limit stack size
+    if (stack.size() > MAX_STACK_SIZE) {
+        stack.resize(MAX_STACK_SIZE);
+    }
+}
+
+HWND MonitorManager::GetLastFocusedWindow(int monitorIndex) const {
+    auto it = m_focusStacks.find(monitorIndex);
+    if (it == m_focusStacks.end() || it->second.empty()) {
+        return nullptr;
+    }
+    
+    // Return the first (most recent) window
+    return it->second[0];
+}
+
+void MonitorManager::PrintFocusStacks() const {
+    std::cout << "\n--- Focus Stacks ---" << std::endl;
+    
+    for (const auto& pair : m_focusStacks) {
+        int monitorIndex = pair.first;
+        const std::vector<HWND>& stack = pair.second;
+        
+        std::cout << "Monitor " << monitorIndex << ": ";
+        
+        if (stack.empty()) {
+            std::cout << "(empty)";
+        } else {
+            for (size_t i = 0; i < stack.size(); ++i) {
+                HWND hwnd = stack[i];
+                
+                // Get window title
+                wchar_t title[256] = L"";
+                int titleLength = GetWindowTextW(hwnd, title, sizeof(title) / sizeof(title[0]));
+                
+                if (i > 0) std::cout << " ";
+                
+                if (titleLength > 0) {
+                    std::wcout << L"[" << title << L"]";
+                } else {
+                    std::cout << "[0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd) 
+                             << std::dec << "]";
+                }
+            }
+        }
+        
+        std::cout << std::endl;
+    }
+    
+    std::cout << "--------------------\n" << std::endl;
 }
