@@ -22,10 +22,13 @@ True Recall is a lightweight background utility that adds per-monitor focus memo
 
 ### Installation
 
-1. Download `true-recall.exe` from the latest release
-2. Run `true-recall.exe`
-3. Look for the True Recall icon in your system tray
-4. Use the default hotkey **Alt+N** to cycle between monitors
+1. Download `true-recall.exe` from the [latest release](https://github.com/yourusername/true-recall/releases)
+2. Place it anywhere you like (Desktop, Program Files, etc.)
+3. Double-click to run
+4. Look for the True Recall icon in your system tray
+5. Use the default hotkey **Alt+N** to cycle between monitors
+
+**That's it!** The config file (`true-recall.ini`) is created automatically on first run.
 
 ### Usage
 
