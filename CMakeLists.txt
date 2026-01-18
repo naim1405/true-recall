@@ -13,6 +13,7 @@ add_executable(wayback
     src/main.cpp
     src/FocusTracker.cpp
     src/MonitorManager.cpp
+    src/HotkeyManager.cpp
 )
 
 if(WIN32)

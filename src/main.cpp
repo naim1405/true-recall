@@ -2,6 +2,7 @@
 #include <iostream>
 #include "FocusTracker.h"
 #include "MonitorManager.h"
+#include "HotkeyManager.h"
 
 // Global flag for clean shutdown
 volatile bool g_running = true;
@@ -38,6 +39,13 @@ int main() {
     FocusTracker tracker(&monitorManager);
     if (!tracker.Start()) {
         std::cerr << "Failed to start focus tracker" << std::endl;
+        return 1;
+    }
+
+    // Create and register hotkeys
+    HotkeyManager hotkeyManager(&monitorManager);
+    if (!hotkeyManager.RegisterHotkeys()) {
+        std::cerr << "Failed to register hotkeys" << std::endl;
         return 1;
     }
 
