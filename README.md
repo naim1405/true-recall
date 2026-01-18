@@ -9,11 +9,12 @@ Wayback is a lightweight background utility that adds per-monitor focus memory t
 ## Features
 
 ✨ **Per-Monitor Focus Memory** - Each monitor remembers its last active window  
-⌨️ **Hotkey-Based Switching** - Instantly jump between monitors with configurable hotkeys  
-🔧 **Customizable** - Edit `wayback.ini` to change hotkeys  
+⌨️ **Hotkey-Based Switching** - Instantly jump between monitors (default: `Alt+N`)  
+🖱️ **Mouse Cursor Movement** - Cursor follows you to the target monitor (optional)  
+🔧 **Customizable** - Edit `wayback.ini` to configure hotkeys and behavior  
 🛡️ **Conflict Detection** - Warns if hotkeys conflict with Windows system shortcuts  
 💻 **System Tray** - Runs silently in the background with tray icon  
-🪶 **Lightweight** - <2MB, minimal CPU/memory usage  
+🪶 **Lightweight** - ~500KB, minimal CPU/memory usage  
 
 ---
 
@@ -173,31 +174,19 @@ All limitations are expected and accepted per the design philosophy.
 ## Troubleshooting
 
 ### Hotkey doesn't work
-
-**Cause:** Hotkey already in use by another application
-
-**Solution:**
-1. Edit `wayback.ini` to use a different hotkey
-2. Restart Wayback
-3. Avoid common Windows hotkeys (Win+D, Win+L, Alt+Tab, etc.)
+**Solution:** Edit `wayback.ini` to use a different hotkey, then restart Wayback. Avoid common Windows hotkeys (Win+D, Win+L, Alt+Tab, etc.)
 
 ### "Failed to register hotkey" error
-
-**Cause:** Hotkey conflict
-
-**Solution:** Choose a different key combination that's not system-reserved
+**Solution:** Choose a different key combination that's not already in use by Windows or another application.
 
 ### Window doesn't focus
+This is expected for some apps (UWP, elevated processes) due to Windows security restrictions.
 
-**Cause:** Application-specific restriction or Windows security policy
-
-**Solution:** This is expected behavior for some apps (UWP, elevated processes)
+### Mouse cursor doesn't move
+Set `MoveMouseToMonitor=true` in `wayback.ini` and restart Wayback.
 
 ### Tray icon doesn't appear
-
-**Cause:** Tray icon creation failed (rare)
-
-**Solution:** Restart Wayback. If persists, check Windows Event Viewer
+Restart Wayback. If the issue persists, check Windows Event Viewer for errors.
 
 ---
 
@@ -222,13 +211,16 @@ wayback/
 ---
 
 ## Technical Details
+## Project Structure
 
-- **Language:** C++17
-- **Platform:** Windows 10/11 (x64)
-- **APIs:** Win32 API (user32, shell32)
-- **Build System:** CMake
-- **Compiler:** MSVC
-
+```
+wayback/
+├── wayback.exe          # Main executable
+├── wayback.ini          # Configuration file (auto-created)
+├── README.md            # User documentation
+├── BUILDING.md          # Build and distribution guide
+├── CHANGELOG.md         # Version history
+└── LICENSE              # MIT License
 ### Dependencies
 
 - **Runtime:** None (fully self-contained)
@@ -258,15 +250,23 @@ MIT License - See [LICENSE](LICENSE) file
 ## Credits
 
 Inspired by [niri](https://github.com/YaLTeR/niri) Wayland compositor's per-monitor focus model.
+Version History
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history and changes.
 
 ---
 
-## Support
+## Support & Contributing
 
-For issues, questions, or suggestions:
-- Check this README and troubleshooting section first
-- Report bugs via GitHub Issues (if applicable)
+- Check this README and [CHANGELOG.md](CHANGELOG.md) first
+- See [BUILDING.md](BUILDING.md) for build instructions
+- Report bugs via GitHub Issues
 
+---
+
+**Made with ❤️ for better multi-monitor workflows on Windows**
+
+*Current version: 1.1
 ---
 
 **Made with ❤️ for better multi-monitor workflows on Windows**
