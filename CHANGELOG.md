@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Wayback will be documented in this file.
+All notable changes to True Recall will be documented in this file.
 
 ## [1.1] - 2026-01-18
 
@@ -15,7 +15,7 @@ All notable changes to Wayback will be documented in this file.
 - `GetMonitorHandle()` method in MonitorManager for monitor positioning
 
 ### Configuration
-Default `wayback.ini` now includes:
+Default `true-recall.ini` now includes:
 ```ini
 CycleMonitorHotkey=Alt+N
 MoveMouseToMonitor=true
@@ -27,7 +27,7 @@ MoveMouseToMonitor=true
 
 ### Added
 - System tray icon with context menu (About, Exit)
-- Configuration file system (`wayback.ini`)
+- Configuration file system (`true-recall.ini`)
 - Customizable hotkeys via INI file
 - Hotkey conflict detection with Windows system shortcuts
 - Support for Ctrl, Alt, Shift, Win modifiers

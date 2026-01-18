@@ -15,7 +15,7 @@ Config::Config() : m_moveMouse(true) {
         exeDir = exeDir.substr(0, lastSlash);
     }
     
-    m_configPath = exeDir + L"\\wayback.ini";
+    m_configPath = exeDir + L"\\true-recall.ini";
 }
 
 bool Config::Load() {
@@ -73,7 +73,7 @@ bool Config::Save() {
         return false;
     }
     
-    file << L"; Wayback Configuration File\n";
+    file << L"; True Recall Configuration File\n";
     file << L"; \n";
     file << L"; Hotkey format: Modifier+Modifier+Key\n";
     file << L"; Modifiers: Ctrl, Alt, Shift, Win\n";

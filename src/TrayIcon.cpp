@@ -29,7 +29,7 @@ bool TrayIcon::Create(HWND hwnd) {
     m_nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     
     // Set tooltip text
-    lstrcpy(m_nid.szTip, TEXT("Wayback - Per-Monitor Focus Switching"));
+    lstrcpy(m_nid.szTip, TEXT("True Recall - Per-Monitor Focus Switching"));
     
     // Add icon to system tray
     if (!Shell_NotifyIcon(NIM_ADD, &m_nid)) {
@@ -69,12 +69,12 @@ void TrayIcon::HandleContextMenu(HWND hwnd) {
 
 void TrayIcon::ShowAboutDialog(HWND hwnd) {
     MessageBox(hwnd, 
-        TEXT("Wayback v1.0\n\n")
+        TEXT("True Recall v1.1\n\n")
         TEXT("Per-Monitor Focus Switching for Windows\n\n")
         TEXT("Default Hotkey: Alt+N\n")
         TEXT("Cycles between monitors and focuses the last active window.\n\n")
-        TEXT("Configure hotkeys and options in wayback.ini"),
-        TEXT("About Wayback"),
+        TEXT("Configure hotkeys and options in true-recall.ini"),
+        TEXT("About True Recall"),
         MB_OK | MB_ICONINFORMATION);
 }
 

@@ -1,8 +1,8 @@
-# Wayback - Per-Monitor Focus Switching for Windows
+# True Recall - Per-Monitor Focus Switching for Windows
 
 **Emulate niri-style per-monitor focus behavior on Windows**
 
-Wayback is a lightweight background utility that adds per-monitor focus memory to Windows, making multi-monitor workflows more efficient and predictable.
+True Recall is a lightweight background utility that adds per-monitor focus memory to Windows, making multi-monitor workflows more efficient and predictable.
 
 ---
 
@@ -11,7 +11,7 @@ Wayback is a lightweight background utility that adds per-monitor focus memory t
 ✨ **Per-Monitor Focus Memory** - Each monitor remembers its last active window  
 ⌨️ **Hotkey-Based Switching** - Instantly jump between monitors (default: `Alt+N`)  
 🖱️ **Mouse Cursor Movement** - Cursor follows you to the target monitor (optional)  
-🔧 **Customizable** - Edit `wayback.ini` to configure hotkeys and behavior  
+🔧 **Customizable** - Edit `true-recall.ini` to configure hotkeys and behavior  
 🛡️ **Conflict Detection** - Warns if hotkeys conflict with Windows system shortcuts  
 💻 **System Tray** - Runs silently in the background with tray icon  
 🪶 **Lightweight** - ~500KB, minimal CPU/memory usage  
@@ -22,9 +22,9 @@ Wayback is a lightweight background utility that adds per-monitor focus memory t
 
 ### Installation
 
-1. Download `wayback.exe` from the latest release
-2. Run `wayback.exe`
-3. Look for the Wayback icon in your system tray
+1. Download `true-recall.exe` from the latest release
+2. Run `true-recall.exe`
+3. Look for the True Recall icon in your system tray
 4. Use the default hotkey **Alt+N** to cycle between monitors
 
 ### Usage
@@ -37,10 +37,10 @@ Wayback is a lightweight background utility that adds per-monitor focus memory t
 
 ### Configuration
 
-Edit `wayback.ini` (created in the same folder as `wayback.exe`):
+Edit `true-recall.ini` (created in the same folder as `true-recall.exe`):
 
 ```ini
-; Wayback Configuration File
+; True Recall Configuration File
 ;
 ; Hotkey format: Modifier+Modifier+Key
 ; Modifiers: Ctrl, Alt, Shift, Win
@@ -70,7 +70,7 @@ CycleMonitorHotkey=Ctrl+Alt+N
 - `Win+Shift+F1` - Use Win key with F1
 - `Ctrl+Shift+9` - Use a number key
 
-**Note:** After editing `wayback.ini`, restart Wayback for changes to take effect.
+**Note:** After editing `true-recall.ini`, restart True Recall for changes to take effect.
 
 ---
 
@@ -86,7 +86,7 @@ CycleMonitorHotkey=Ctrl+Alt+N
 
 ```powershell
 # Clone or download the repository
-cd wayback
+cd true-recall
 
 # Create build directory
 mkdir build
@@ -98,7 +98,7 @@ cmake ..
 # Build Release version (no console, GUI tray app)
 cmake --build . --config Release
 
-# The executable will be at: build/Release/wayback.exe
+# The executable will be at: build/Release/true-recall.exe
 ```
 
 ### Build Types
@@ -114,17 +114,17 @@ cmake --build . --config Release
 
 1. Press `Win+R`
 2. Type `shell:startup` and press Enter
-3. Copy `wayback.exe` to this folder
+3. Copy `true-recall.exe` to this folder
 4. Done! Wayback will start on every login
 
 ### Method 2: Task Scheduler (Advanced)
 
 1. Open Task Scheduler
 2. Create Basic Task
-3. Name: "Wayback"
+3. Name: "True Recall"
 4. Trigger: "When I log on"
 5. Action: "Start a program"
-6. Program: Browse to `wayback.exe`
+6. Program: Browse to `true-recall.exe`
 7. Finish
 
 ---
@@ -174,7 +174,7 @@ All limitations are expected and accepted per the design philosophy.
 ## Troubleshooting
 
 ### Hotkey doesn't work
-**Solution:** Edit `wayback.ini` to use a different hotkey, then restart Wayback. Avoid common Windows hotkeys (Win+D, Win+L, Alt+Tab, etc.)
+**Solution:** Edit `true-recall.ini` to use a different hotkey, then restart True Recall. Avoid common Windows hotkeys (Win+D, Win+L, Alt+Tab, etc.)
 
 ### "Failed to register hotkey" error
 **Solution:** Choose a different key combination that's not already in use by Windows or another application.
@@ -183,18 +183,18 @@ All limitations are expected and accepted per the design philosophy.
 This is expected for some apps (UWP, elevated processes) due to Windows security restrictions.
 
 ### Mouse cursor doesn't move
-Set `MoveMouseToMonitor=true` in `wayback.ini` and restart Wayback.
+Set `MoveMouseToMonitor=true` in `true-recall.ini` and restart True Recall.
 
 ### Tray icon doesn't appear
-Restart Wayback. If the issue persists, check Windows Event Viewer for errors.
+Restart True Recall. If the issue persists, check Windows Event Viewer for errors.
 
 ---
 
 ## Uninstalling
 
-1. Right-click the Wayback tray icon
+1. Right-click the True Recall tray icon
 2. Click "Exit"
-3. Delete `wayback.exe` and `wayback.ini`
+3. Delete `true-recall.exe` and `true-recall.ini`
 4. If added to Startup folder, remove it from there too
 
 ---
@@ -214,9 +214,9 @@ wayback/
 ## Project Structure
 
 ```
-wayback/
-├── wayback.exe          # Main executable
-├── wayback.ini          # Configuration file (auto-created)
+true-recall/
+├── true-recall.exe      # Main executable
+├── true-recall.ini      # Configuration file (auto-created)
 ├── README.md            # User documentation
 ├── BUILDING.md          # Build and distribution guide
 ├── CHANGELOG.md         # Version history

@@ -14,8 +14,8 @@ class Config {
 public:
     Config();
     
-    bool Load();  // Load from wayback.ini
-    bool Save();  // Save to wayback.ini
+    bool Load();  // Load from true-recall.ini
+    bool Save();  // Save to true-recall.ini
     
     HotkeyConfig GetHotkeyConfig() const { return m_hotkey; }
     void SetHotkeyConfig(const HotkeyConfig& hotkey) { m_hotkey = hotkey; }

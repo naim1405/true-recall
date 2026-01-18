@@ -24,7 +24,7 @@ bool HotkeyManager::CreateMessageWindow() {
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.lpfnWndProc = WndProc;
     wc.hInstance = GetModuleHandle(nullptr);
-    wc.lpszClassName = "WaybackHotkeyWindow";
+    wc.lpszClassName = "TrueRecallHotkeyWindow";
     
     if (!RegisterClassEx(&wc)) {
         DWORD error = GetLastError();
@@ -37,8 +37,8 @@ bool HotkeyManager::CreateMessageWindow() {
     // Create message-only window
     m_messageWindow = CreateWindowEx(
         0,
-        "WaybackHotkeyWindow",
-        "Wayback Hotkey Window",
+        "TrueRecallHotkeyWindow",
+        "True Recall Hotkey Window",
         0,
         0, 0, 0, 0,
         HWND_MESSAGE,  // Message-only window

@@ -48,7 +48,7 @@ bool CreateMainWindow() {
     wc.cbSize = sizeof(WNDCLASSEX);
     wc.lpfnWndProc = MainWndProc;
     wc.hInstance = GetModuleHandle(nullptr);
-    wc.lpszClassName = "WaybackMainWindow";
+    wc.lpszClassName = "TrueRecallMainWindow";
     
     if (!RegisterClassEx(&wc)) {
         DWORD error = GetLastError();
@@ -61,8 +61,8 @@ bool CreateMainWindow() {
     // Create message-only window
     g_mainWindow = CreateWindowEx(
         0,
-        "WaybackMainWindow",
-        "Wayback",
+        "TrueRecallMainWindow",
+        "True Recall",
         0,
         0, 0, 0, 0,
         HWND_MESSAGE,  // Message-only window
@@ -94,7 +94,7 @@ int main() {
         return 1;
     }
 
-    std::cout << "Wayback started." << std::endl;
+    std::cout << "True Recall started." << std::endl;
     
     // Create main window for tray icon
     if (!CreateMainWindow()) {
@@ -164,7 +164,7 @@ int main() {
     // Unregister hotkeys
     hotkeyManager.UnregisterHotkeys();
     
-    std::cout << "Wayback terminated cleanly." << std::endl;
+    std::cout << "True Recall terminated cleanly." << std::endl;
     
     #ifdef _DEBUG
     FreeConsole();

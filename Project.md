@@ -1,4 +1,4 @@
-# Project Context: Per-Monitor Focus Switching (Windows Prototype)
+# Project Context: True Recall - Per-Monitor Focus Switching
 
 ## Intent
 
