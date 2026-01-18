@@ -32,7 +32,7 @@ True Recall is a lightweight background utility that adds per-monitor focus memo
 1. Open applications on different monitors
 2. Work naturally, switching focus between windows
 3. Press **Alt+N** to jump to the next monitor
-4. Wayback automatically focuses the last active window on that monitor
+4. True Recall automatically focuses the last active window on that monitor
 5. (Optional) Mouse cursor moves to the target monitor automatically
 
 ### Configuration
@@ -44,31 +44,24 @@ Edit `true-recall.ini` (created in the same folder as `true-recall.exe`):
 ;
 ; Hotkey format: Modifier+Modifier+Key
 ; Modifiers: Ctrl, Alt, Shift, Win
-; Keys: A-ZAlt+M
+; Keys: A-Z, 0-9, F1-F12
 
 CycleMonitorHotkey=Alt+N
 
 ; Move mouse cursor to the monitor when switching
 ; Set to true or false
 MoveMouseToMonitor=true
-CycleMonitorHotkey=Ctrl+Alt+N
 ```
 
-**Supported Keys:**
-- Letters: A-Z
-- Numbers: 0-9
-- Function keys: Add Ctrl modifier
+**Hotkey Examples:**
+- `Alt+M` - Simple Alt+Key combination
+- `Ctrl+Alt+M` - Different letter
 - `Win+Shift+F1` - Use Win key with F1
 - `Ctrl+Shift+9` - Use a number key
-- `Alt+M` - Simple Alt+Key combination
 
 **Mouse Cursor Movement:**
 - `MoveMouseToMonitor=true` - Cursor moves to center of target monitor (default)
 - `MoveMouseToMonitor=false` - Cursor stays in place
-**Examples:**
-- `Ctrl+Alt+M` - Different letter
-- `Win+Shift+F1` - Use Win key with F1
-- `Ctrl+Shift+9` - Use a number key
 
 **Note:** After editing `true-recall.ini`, restart True Recall for changes to take effect.
 
@@ -115,7 +108,7 @@ cmake --build . --config Release
 1. Press `Win+R`
 2. Type `shell:startup` and press Enter
 3. Copy `true-recall.exe` to this folder
-4. Done! Wayback will start on every login
+4. Done! True Recall will start on every login
 
 ### Method 2: Task Scheduler (Advanced)
 
@@ -133,7 +126,7 @@ cmake --build . --config Release
 
 ### Architecture
 
-Wayback uses Windows accessibility hooks to track focus changes:
+True Recall uses Windows accessibility hooks to track focus changes:
 
 1. **EVENT_SYSTEM_FOREGROUND** - Tracks when windows gain focus
 2. **EVENT_OBJECT_DESTROY** - Cleans up when windows are closed
@@ -199,18 +192,6 @@ Restart True Recall. If the issue persists, check Windows Event Viewer for error
 
 ---
 
-##File Structure
-
-```
-wayback/
-├── wayback.exe          # Main executable
-├── wayback.ini          # Configuration file (auto-created)
-└── README.md            # This file
-```
-
----
-
-## Technical Details
 ## Project Structure
 
 ```
@@ -221,6 +202,8 @@ true-recall/
 ├── BUILDING.md          # Build and distribution guide
 ├── CHANGELOG.md         # Version history
 └── LICENSE              # MIT License
+```
+
 ### Dependencies
 
 - **Runtime:** None (fully self-contained)
@@ -250,7 +233,10 @@ MIT License - See [LICENSE](LICENSE) file
 ## Credits
 
 Inspired by [niri](https://github.com/YaLTeR/niri) Wayland compositor's per-monitor focus model.
-Version History
+
+---
+
+## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history and changes.
 
@@ -266,7 +252,4 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history and changes.
 
 **Made with ❤️ for better multi-monitor workflows on Windows**
 
-*Current version: 1.1
----
-
-**Made with ❤️ for better multi-monitor workflows on Windows**
+*Current version: 1.1*
