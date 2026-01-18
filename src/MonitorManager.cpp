@@ -100,6 +100,83 @@ HWND MonitorManager::GetLastFocusedWindow(int monitorIndex) const {
     return it->second[0];
 }
 
+void MonitorManager::RemoveWindowFromStack(int monitorIndex, HWND hwnd) {
+    auto it = m_focusStacks.find(monitorIndex);
+    if (it == m_focusStacks.end()) {
+        return;
+    }
+    
+    std::vector<HWND>& stack = it->second;
+    auto windowIt = std::find(stack.begin(), stack.end(), hwnd);
+    
+    if (windowIt != stack.end()) {
+        stack.erase(windowIt);
+        std::cout << "  Removed window 0x" << std::hex << hwnd << std::dec 
+                  << " from Monitor " << monitorIndex << " stack" << std::endl;
+    }
+}
+
+void MonitorManager::RemoveWindowFromAllStacks(HWND hwnd) {
+    for (auto& pair : m_focusStacks) {
+        std::vector<HWND>& stack = pair.second;
+        auto it = std::find(stack.begin(), stack.end(), hwnd);
+        
+        if (it != stack.end()) {
+            stack.erase(it);
+            std::cout << "  Removed destroyed window 0x" << std::hex << hwnd << std::dec 
+                      << " from Monitor " << pair.first << " stack" << std::endl;
+        }
+    }
+}
+
+// Helper struct for EnumWindows callback
+struct FindWindowData {
+    HMONITOR targetMonitor;
+    HWND foundWindow;
+};
+
+static BOOL CALLBACK FindWindowOnMonitorProc(HWND hwnd, LPARAM lParam) {
+    FindWindowData* data = reinterpret_cast<FindWindowData*>(lParam);
+    
+    // Check if window is visible and not minimized
+    if (!IsWindowVisible(hwnd) || IsIconic(hwnd)) {
+        return TRUE;  // Continue enumeration
+    }
+    
+    // Check if window has a title (skip invisible/system windows)
+    wchar_t title[256];
+    if (GetWindowTextW(hwnd, title, sizeof(title) / sizeof(title[0])) == 0) {
+        return TRUE;  // Continue enumeration
+    }
+    
+    // Check if window is on the target monitor
+    HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+    if (hMonitor == data->targetMonitor) {
+        data->foundWindow = hwnd;
+        return FALSE;  // Stop enumeration, found a window
+    }
+    
+    return TRUE;  // Continue enumeration
+}
+
+void MonitorManager::TryFindWindowOnMonitor(int monitorIndex) {
+    if (monitorIndex < 0 || monitorIndex >= static_cast<int>(m_monitors.size())) {
+        return;
+    }
+    
+    FindWindowData data;
+    data.targetMonitor = m_monitors[monitorIndex];
+    data.foundWindow = nullptr;
+    
+    // Enumerate all top-level windows
+    EnumWindows(FindWindowOnMonitorProc, reinterpret_cast<LPARAM>(&data));
+    
+    if (data.foundWindow) {
+        std::cout << "  Found window on monitor, attempting to focus..." << std::endl;
+        SetForegroundWindow(data.foundWindow);
+    }
+}
+
 void MonitorManager::PrintFocusStacks() const {
     std::cout << "\n--- Focus Stacks ---" << std::endl;
     

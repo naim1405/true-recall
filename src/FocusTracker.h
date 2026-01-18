@@ -14,11 +14,23 @@ public:
     void Stop();   // Remove hook
 
 private:
-    HWINEVENTHOOK m_hook;
+    HWINEVENTHOOK m_focusHook;
+    HWINEVENTHOOK m_destroyHook;
     MonitorManager* m_monitorManager;
 
-    // Static callback for the hook
-    static void CALLBACK WinEventProc(
+    // Static callback for focus events
+    static void CALLBACK FocusEventProc(
+        HWINEVENTHOOK hWinEventHook,
+        DWORD event,
+        HWND hwnd,
+        LONG idObject,
+        LONG idChild,
+        DWORD idEventThread,
+        DWORD dwmsEventTime
+    );
+    
+    // Static callback for window destruction
+    static void CALLBACK DestroyEventProc(
         HWINEVENTHOOK hWinEventHook,
         DWORD event,
         HWND hwnd,

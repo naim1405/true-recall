@@ -65,6 +65,15 @@ int main() {
         }
     }
 
-    std::cout << "Wayback terminated." << std::endl;
+    // Clean shutdown
+    std::cout << "\nCleaning up..." << std::endl;
+    
+    // Stop focus tracker (unhooks events)
+    tracker.Stop();
+    
+    // Unregister hotkeys
+    hotkeyManager.UnregisterHotkeys();
+    
+    std::cout << "Wayback terminated cleanly." << std::endl;
     return 0;
 }

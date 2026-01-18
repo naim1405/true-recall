@@ -97,56 +97,98 @@ void HotkeyManager::HandleHotkey(int hotkeyId) {
     // Cycle to next monitor
     m_currentMonitor = (m_currentMonitor + 1) % monitorCount;
     
-    std::cout << "Switched to Monitor " << m_currentMonitor << std::endl;
+    std::cout << "\nSwitched to Monitor " << m_currentMonitor << std::endl;
     
-    // Get last focused window on this monitor
-    HWND targetWindow = m_monitorManager->GetLastFocusedWindow(m_currentMonitor);
+    // Try to get a valid window from the focus stack
+    // If the top window is invalid, try the next one
+    HWND targetWindow = nullptr;
+    const int MAX_ATTEMPTS = 5;  // Try up to 5 windows from the stack
     
-    if (!targetWindow) {
-        std::cout << "  No windows on Monitor " << m_currentMonitor << std::endl;
-        return;
+    for (int attempt = 0; attempt < MAX_ATTEMPTS; ++attempt) {
+        targetWindow = m_monitorManager->GetLastFocusedWindow(m_currentMonitor);
+        
+        if (!targetWindow) {
+            break;  // No more windows in stack
+        }
+        
+        // Validate window
+        if (IsWindow(targetWindow) && IsWindowVisible(targetWindow) && !IsIconic(targetWindow)) {
+            // Found a valid window, try to activate it
+            if (ActivateWindow(targetWindow)) {
+                return;  // Success!
+            }
+        }
+        
+        // Window is invalid or couldn't be activated, remove it and try next
+        std::cout << "  Removing invalid/unactivatable window from stack" << std::endl;
+        m_monitorManager->RemoveWindowFromStack(m_currentMonitor, targetWindow);
     }
     
-    // Try to activate the window
-    if (!ActivateWindow(targetWindow)) {
-        std::cout << "  Warning: Failed to activate window 0x" 
-                  << std::hex << targetWindow << std::dec << std::endl;
-    }
+    // If we got here, no valid windows were found
+    std::cout << "  No valid windows found on Monitor " << m_currentMonitor << std::endl;
+    
+    // Try to find ANY visible window on this monitor as a fallback
+    m_monitorManager->TryFindWindowOnMonitor(m_currentMonitor);
 }
 
 bool HotkeyManager::ActivateWindow(HWND hwnd) {
-    // Validate window
+    // Validate window exists
     if (!IsWindow(hwnd)) {
         std::cout << "  Window no longer valid" << std::endl;
         return false;
     }
     
+    // Validate window is visible
     if (!IsWindowVisible(hwnd)) {
         std::cout << "  Window not visible" << std::endl;
         return false;
     }
     
-    // Try to bring window to foreground
-    // First attempt: direct SetForegroundWindow
+    // Don't focus minimized windows
+    if (IsIconic(hwnd)) {
+        std::cout << "  Window is minimized, restoring first" << std::endl;
+        ShowWindow(hwnd, SW_RESTORE);
+    }
+    
+    // Strategy 1: Direct SetForegroundWindow
     if (SetForegroundWindow(hwnd)) {
+        std::cout << "  Activated successfully (direct)" << std::endl;
         return true;
     }
     
-    // Second attempt: Use AttachThreadInput workaround
-    DWORD foregroundThreadId = GetWindowThreadProcessId(GetForegroundWindow(), nullptr);
-    DWORD targetThreadId = GetWindowThreadProcessId(hwnd, nullptr);
-    
-    if (foregroundThreadId != targetThreadId) {
-        AttachThreadInput(foregroundThreadId, targetThreadId, TRUE);
-        SetForegroundWindow(hwnd);
-        AttachThreadInput(foregroundThreadId, targetThreadId, FALSE);
+    // Strategy 2: AttachThreadInput workaround
+    HWND currentForeground = GetForegroundWindow();
+    if (currentForeground != nullptr) {
+        DWORD foregroundThreadId = GetWindowThreadProcessId(currentForeground, nullptr);
+        DWORD targetThreadId = GetWindowThreadProcessId(hwnd, nullptr);
+        
+        if (foregroundThreadId != 0 && targetThreadId != 0 && foregroundThreadId != targetThreadId) {
+            if (AttachThreadInput(foregroundThreadId, targetThreadId, TRUE)) {
+                SetForegroundWindow(hwnd);
+                SetFocus(hwnd);
+                AttachThreadInput(foregroundThreadId, targetThreadId, FALSE);
+                
+                if (GetForegroundWindow() == hwnd) {
+                    std::cout << "  Activated successfully (AttachThreadInput)" << std::endl;
+                    return true;
+                }
+            }
+        }
     }
     
-    // Try BringWindowToTop as fallback
+    // Strategy 3: BringWindowToTop + SetFocus fallback
     BringWindowToTop(hwnd);
+    SetFocus(hwnd);
     
-    // Check if we succeeded
-    return (GetForegroundWindow() == hwnd);
+    // Final check
+    bool success = (GetForegroundWindow() == hwnd);
+    if (success) {
+        std::cout << "  Activated successfully (fallback)" << std::endl;
+    } else {
+        std::cout << "  Warning: Could not fully activate window" << std::endl;
+    }
+    
+    return success;
 }
 
 LRESULT CALLBACK HotkeyManager::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {

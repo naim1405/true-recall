@@ -15,6 +15,9 @@ public:
     // Focus stack management
     void OnWindowFocused(HWND hwnd);  // Called when window gets focus
     HWND GetLastFocusedWindow(int monitorIndex) const;  // Top of stack
+    void RemoveWindowFromStack(int monitorIndex, HWND hwnd);  // Remove invalid window
+    void RemoveWindowFromAllStacks(HWND hwnd);  // Remove from all monitors
+    void TryFindWindowOnMonitor(int monitorIndex);  // Fallback: find any window
     void PrintFocusStacks() const;  // Debug output
     
     // For debugging

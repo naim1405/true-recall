@@ -3,7 +3,8 @@
 #include <iostream>
 
 FocusTracker::FocusTracker(MonitorManager* monitorManager)
-    : m_hook(nullptr)
+    : m_focusHook(nullptr)
+    , m_destroyHook(nullptr)
     , m_monitorManager(monitorManager)
 {
 }
@@ -13,25 +14,41 @@ FocusTracker::~FocusTracker() {
 }
 
 bool FocusTracker::Start() {
-    if (m_hook != nullptr) {
+    if (m_focusHook != nullptr) {
         std::cerr << "FocusTracker already started" << std::endl;
         return false;
     }
 
     // Install hook for foreground window changes
-    m_hook = SetWinEventHook(
+    m_focusHook = SetWinEventHook(
         EVENT_SYSTEM_FOREGROUND,     // eventMin
         EVENT_SYSTEM_FOREGROUND,     // eventMax
         nullptr,                     // hmodWinEventProc
-        WinEventProc,                // callback function
+        FocusEventProc,              // callback function
         0,                           // idProcess (0 = all processes)
         0,                           // idThread (0 = all threads)
         WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS  // dwFlags
     );
 
-    if (m_hook == nullptr) {
+    if (m_focusHook == nullptr) {
         std::cerr << "Failed to install focus tracking hook" << std::endl;
         return false;
+    }
+    
+    // Install hook for window destruction
+    m_destroyHook = SetWinEventHook(
+        EVENT_OBJECT_DESTROY,        // eventMin
+        EVENT_OBJECT_DESTROY,        // eventMax
+        nullptr,                     // hmodWinEventProc
+        DestroyEventProc,            // callback function
+        0,                           // idProcess (0 = all processes)
+        0,                           // idThread (0 = all threads)
+        WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS  // dwFlags
+    );
+    
+    if (m_destroyHook == nullptr) {
+        std::cerr << "Warning: Failed to install destroy tracking hook" << std::endl;
+        // Continue anyway, this is not critical
     }
 
     std::cout << "Focus tracking started" << std::endl;
@@ -39,14 +56,20 @@ bool FocusTracker::Start() {
 }
 
 void FocusTracker::Stop() {
-    if (m_hook != nullptr) {
-        UnhookWinEvent(m_hook);
-        m_hook = nullptr;
-        std::cout << "Focus tracking stopped" << std::endl;
+    if (m_focusHook != nullptr) {
+        UnhookWinEvent(m_focusHook);
+        m_focusHook = nullptr;
     }
+    
+    if (m_destroyHook != nullptr) {
+        UnhookWinEvent(m_destroyHook);
+        m_destroyHook = nullptr;
+    }
+    
+    std::cout << "Focus tracking stopped" << std::endl;
 }
 
-void CALLBACK FocusTracker::WinEventProc(
+void CALLBACK FocusTracker::FocusEventProc(
     HWINEVENTHOOK hWinEventHook,
     DWORD event,
     HWND hwnd,
@@ -101,5 +124,32 @@ void CALLBACK FocusTracker::WinEventProc(
     // Print focus stacks after each focus change
     if (g_monitorManager != nullptr) {
         g_monitorManager->PrintFocusStacks();
+    }
+}
+
+void CALLBACK FocusTracker::DestroyEventProc(
+    HWINEVENTHOOK hWinEventHook,
+    DWORD event,
+    HWND hwnd,
+    LONG idObject,
+    LONG idChild,
+    DWORD idEventThread,
+    DWORD dwmsEventTime
+) {
+    // Only process if it's a window object
+    if (idObject != OBJID_WINDOW || idChild != CHILDID_SELF) {
+        return;
+    }
+
+    // Skip if no valid window handle
+    if (hwnd == nullptr) {
+        return;
+    }
+
+    extern MonitorManager* g_monitorManager;
+    
+    if (g_monitorManager != nullptr) {
+        // Remove this window from all focus stacks
+        g_monitorManager->RemoveWindowFromAllStacks(hwnd);
     }
 }
