@@ -115,17 +115,24 @@ void MonitorManager::PrintFocusStacks() const {
             for (size_t i = 0; i < stack.size(); ++i) {
                 HWND hwnd = stack[i];
                 
+                // Verify window is still valid
+                if (!IsWindow(hwnd)) {
+                    continue;  // Skip invalid windows
+                }
+                
                 // Get window title
                 wchar_t title[256] = L"";
                 int titleLength = GetWindowTextW(hwnd, title, sizeof(title) / sizeof(title[0]));
                 
                 if (i > 0) std::cout << " ";
                 
+                // Always show HWND, optionally show title if available
+                std::cout << "[0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd) << std::dec;
+                
                 if (titleLength > 0) {
-                    std::wcout << L"[" << title << L"]";
+                    std::wcout << L": " << title << L"]";
                 } else {
-                    std::cout << "[0x" << std::hex << reinterpret_cast<uintptr_t>(hwnd) 
-                             << std::dec << "]";
+                    std::cout << "]";
                 }
             }
         }
