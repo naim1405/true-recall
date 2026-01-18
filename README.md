@@ -14,7 +14,7 @@ True Recall is a lightweight background utility that adds per-monitor focus memo
 🔧 **Customizable** - Edit `true-recall.ini` to configure hotkeys and behavior  
 🛡️ **Conflict Detection** - Warns if hotkeys conflict with Windows system shortcuts  
 💻 **System Tray** - Runs silently in the background with tray icon  
-🪶 **Lightweight** - ~500KB, minimal CPU/memory usage  
+🪶 **Lightweight** - minimal CPU/memory usage  
 
 ---
 
